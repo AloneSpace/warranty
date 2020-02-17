@@ -1,0 +1,40 @@
+version: '3.7'
+services:
+  www:
+    container_name: warranty_www
+    restart: 'no'
+    image: custom-php
+    volumes:
+      - ./www:/var/www/html
+    ports:
+      - mode: host
+        target: 80
+        published: 80
+  www_db:
+    container_name: warranty_db
+    image: mariadb:10.1
+    volumes:
+      - ./db:/var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: warrantypassword
+      MYSQL_DATABASE: warrantydb
+      MYSQL_USER: warrantyuser
+      MYSQL_PASSWORD: warrantypassword
+      TZ: "Asia/Bangkok"
+    restart: 'no'
+  www_pma:
+    container_name: warranty_pma
+    depends_on:
+      - www_db
+    image: phpmyadmin/phpmyadmin
+    links:
+     - www_db:db
+    ports:
+      - "8181:80"
+    restart: 'no'
+    environment:
+      PMA_HOST: www_db
+      MYSQL_ROOT_PASSWORD: warrantypassword
+      TZ: "Asia/Bangkok"
